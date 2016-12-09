@@ -21,14 +21,17 @@ def parse_server_header(server_hdr):
   if m:
     logger.info("Found match in header '%s'" % server_hdr)
     return (m.group(1), m.group(2))
-  return None 
+  return None
+
+def send_request(server, method="HEAD", uri="/"):
+  conn = httplib.HTTPConnection(server)
+  logger.info("Sending %s request to %s" % (method, server))
+  conn.request(method, uri)
+  resp = conn.getresponse()
+  return resp
 
 def probe_server(server):
-  conn = httplib.HTTPConnection(server)
-  method = "HEAD"
-  logger.info("Sending %s request to %s" % (method, server))
-  conn.request(method, "/")
-  resp = conn.getresponse()
+  resp = send_request(server) 
   spr = ServerProbeResult()
   logger.info("Status code for %s request is %d" % (method, resp.status))
   if resp.status == httplib.FORBIDDEN:
