@@ -1,11 +1,11 @@
 #!/usr/bin/env python3.5
 
+import argparse
 import enum
 import http
 import http.client
 import logging
 import logging.config
-
 import re
 import sys
 
@@ -66,11 +66,31 @@ def probe_server(server):
     spr.version = s[1]
   return spr
 
-def main():
-  for server in sys.argv[1:]:
+def probe_servers(servers, versions):
+  for server in servers:
     logger.debug("Probing %s" % server)
     spr = probe_server(server)
-    print(spr.name, spr.version, spr.listing)
+    if spr.name in versions and spr.version and spr.version.startswith(versions[spr.name]):
+        print("MATCH:", spr.name, spr.version, spr.listing)
+    else:
+      print("NO MATCH:", spr.name, spr.version, spr.listing) 
+
+def main():
+  description = "Probes a web server" 
+  parser = argparse.ArgumentParser(description=description)
+  parser.add_argument("-n", "--nginx", 
+                      default="1.2",
+                      help="nginx's verion to look for")
+  parser.add_argument("-i", "--iis",
+                      default="7.0",
+                      help="iis's version to look for")
+  parser.add_argument("server",
+                      nargs='+',
+                      help="a server that will be probed")
+  args = parser.parse_args()
+  versions = {"nginx": args.nginx, "Microsoft-IIS": args.iis}
+  
+  probe_servers(args.server, versions)
 
 if __name__ == '__main__':
   main()
