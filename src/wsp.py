@@ -32,7 +32,7 @@ def parse_server_header(server_hdr):
   if m:
     return (m.group(1), m.group(2))
   else:
-    logger.warn("Could not match header '%s'" % server_hdr)
+    logger.warn("Could not match header '%s' against regexp" % server_hdr)
   return None
 
 def get_dir_listing(status):
