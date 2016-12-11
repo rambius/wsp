@@ -18,6 +18,24 @@ class TestParseServerHeader(unittest.TestCase):
     self.assertEqual(s, "Microsoft-IIS", "server parsed incorrectly")
     self.assertEqual(v, "8.5", "version parsed incorrectly")
 
+  def test_parse_nginx_noversion(self):
+    header = "nginx"
+    (s, v) = wsp.parse_server_header(header)
+    self.assertEqual(s, "nginx", "server parsed incorrectly")
+    self.assertIsNone(v, "version parsed incorrectly")
+
+  def test_parse_iis_noversion(self):
+    header = "Microsoft-IIS"
+    (s, v) = wsp.parse_server_header(header)
+    self.assertEqual(s, "Microsoft-IIS", "server parsed incorrectly")
+    self.assertIsNone(v, "version parsed incorrectly")
+
+  def test_parse_unknown(self):
+    header = "unknown"
+    (s, v) = wsp.parse_server_header(header)
+    self.assertIsNone(s, "server parsed incorrectly")
+    self.assertIsNone(v, "version parsed incorrectly")
+
 class TestGetDirListing(unittest.TestCase):
   
   def test_get_dir_listing_ok(self):

@@ -28,12 +28,17 @@ class ServerProbeResult:
     self.listing = listing
 
 def parse_server_header(server_hdr):
-  m = re.match(r"([\w-]*)/([\w\.]*)", server_hdr)
-  if m:
-    return (m.group(1), m.group(2))
-  else:
-    logger.warn("Could not match header '%s' against regexp" % server_hdr)
-  return None
+  regexps = [r"([\w-]*)/([\w\.]*)", r"(nginx|Microsoft-IIS)"]
+  for regexp in regexps:
+    m = re.match(regexp, server_hdr)
+    if m:
+      if len(m.groups()) == 2: 
+        return (m.group(1), m.group(2))
+      elif len(m.groups()) == 1:
+        return (m.group(1), None)
+
+  logger.warning("Could not match header '%s' against regexps" % server_hdr)
+  return (None, None)
 
 def get_dir_listing(status):
   if status == http.HTTPStatus.FORBIDDEN:
