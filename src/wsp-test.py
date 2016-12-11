@@ -24,5 +24,13 @@ class TestGetDirListing(unittest.TestCase):
     dl = wsp.get_dir_listing(http.HTTPStatus.OK)
     self.assertEqual(dl, wsp.DirListing.enabled)
 
+  def test_get_dir_listing_uknown(self):
+    dl = wsp.get_dir_listing(http.HTTPStatus.UNAUTHORIZED)
+    self.assertEqual(dl, wsp.DirListing.unknown)
+
+  def test_get_dir_listing_disabled(self):
+    dl = wsp.get_dir_listing(http.HTTPStatus.FORBIDDEN)
+    self.assertEqual(dl, wsp.DirListing.disabled)
+
 if __name__ == "__main__":
   unittest.main()
