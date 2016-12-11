@@ -66,11 +66,14 @@ def probe_server(server):
     spr.version = s[1]
   return spr
 
+def compare_server_version(spr, versions):
+  return (spr.name in versions) and spr.version and spr.version.startswith(versions[spr.name])
+
 def probe_servers(servers, versions):
   for server in servers:
     logger.debug("Probing %s" % server)
     spr = probe_server(server)
-    if spr.name in versions and spr.version and spr.version.startswith(versions[spr.name]):
+    if (compare_server_version(spr, versions)):
         print("MATCH:", spr.name, spr.version, spr.listing)
     else:
       print("NO MATCH:", spr.name, spr.version, spr.listing) 
