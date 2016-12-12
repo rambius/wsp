@@ -18,6 +18,12 @@ class TestParseServerHeader(unittest.TestCase):
     self.assertEqual(s, "Microsoft-IIS", "server parsed incorrectly")
     self.assertEqual(v, "8.5", "version parsed incorrectly")
 
+  def test_parse_apache_2_4_7_ubuntu(self):
+    header = "Apache/2.4.7 (Ubuntu)"
+    (s, v) = wsp.parse_server_header(header)
+    self.assertEqual(s, "Apache", "server parsed incorrectly")
+    self.assertEqual(v, "2.4.7", "version parsed incorrectly")
+
   def test_parse_nginx_noversion(self):
     header = "nginx"
     (s, v) = wsp.parse_server_header(header)
