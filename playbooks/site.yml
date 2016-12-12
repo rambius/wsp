@@ -1,0 +1,47 @@
+---
+- name: setup wsp test env
+  hosts: localhost
+  connection: local
+  vars:
+    nginx_baseurl: http://nginx.org/download
+    remote_home: "{{ ansible_env.HOME }}"
+    downloads_dir: "{{ remote_home }}/Downloads"
+    nginxes_dir: "{{ remote_home }}/nginxes"
+    nginxes_versions: ["1.11.6", "1.10.2", "1.8.1", "1.6.3", "1.4.7", "1.2.9"]
+  tasks:
+  - name: fetch nginx
+    get_url:
+      url: "{{ nginx_baseurl }}/nginx-{{ item }}.tar.gz"
+      dest: "{{ downloads_dir }}/nginx-{{ item }}.tar.gz"
+    with_items: "{{ nginxes_versions }}"
+  - name: extract nginx
+    unarchive:
+      src: "{{ downloads_dir }}/nginx-{{ item }}.tar.gz"
+      dest: "{{ downloads_dir }}"
+      creates: "{{ downloads_dir }}/nginx-{{ item }}"
+    with_items: "{{ nginxes_versions }}"
+  - name: configure nginx
+    command: "./configure --prefix={{ nginxes_dir }}/nginx-{{ item }}"
+    args:
+      chdir: "{{ downloads_dir }}/nginx-{{ item }}"
+    with_items: "{{ nginxes_versions }}"
+  - name: install nginx
+    command: make install
+    args:
+      chdir: "{{ downloads_dir }}/nginx-{{ item }}"
+      creates: "{{ nginxes_dir }}/nginx-{{ item }}"
+    with_items: "{{ nginxes_versions }}"
+  - name: copy nginx.conf
+    copy:
+      src: "files/{{ item }}/nginx.conf"
+      dest: "{{ nginxes_dir }}/nginx-{{ item }}/conf/nginx.conf"
+      backup: yes
+    with_items: "{{ nginxes_versions }}"
+  - name: copy start-all.sh
+    copy:
+      src: "{{ item }}" 
+      dest: "{{ nginxes_dir }}"
+      mode: "u+rwx"
+      backup: yes
+    with_fileglob:
+      - files/*-all.sh
