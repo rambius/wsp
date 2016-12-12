@@ -45,3 +45,10 @@
       backup: yes
     with_fileglob:
       - files/*-all.sh
+
+  - name: delete index.html 
+    file: path="{{nginxes_dir}}/nginx-{{ item }}/html/index.html" state=absent
+    with_items:
+      - "1.4.7"
+      - "1.6.3"
+
